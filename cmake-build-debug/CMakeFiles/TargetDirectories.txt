@@ -1,0 +1,3 @@
+/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/lab05.dir
