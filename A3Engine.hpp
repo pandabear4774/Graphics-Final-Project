@@ -136,6 +136,7 @@ private:
 
         GLuint spotlightPosition;
 
+        GLuint modelMatrix;
 
         GLuint lightDirection;
 

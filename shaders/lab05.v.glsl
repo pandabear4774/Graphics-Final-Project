@@ -6,6 +6,7 @@ uniform mat3 normMatrix;
 uniform vec3 lightDir;
 uniform vec3 lightColor;
 uniform vec3 spotLightPosition;
+uniform mat4 modelMatrix;
 
 uniform vec3 materialColor;             // the material color for our vertex (& whole object)
 
@@ -22,45 +23,37 @@ void main() {
     // transform & output the vertex in clip space
     gl_Position = mvpMatrix * vec4(vPos, 1.0);
 
-    //ambient lighting
-    float ambientStrength = 0.05;
-    color += ambientStrength * lightColor;
-
     vec3 reverseLightVector = normalize(-1 * lightDir);
-    vec3 trueVecNormal = vecNormal * normMatrix;
+    vec3 trueVecNormal = normMatrix * vecNormal;
     vec3 diffuseComponent = lightColor * max(dot(reverseLightVector, trueVecNormal), 0);
 
     color += diffuseComponent;
 
-
-
-    //spot light
+//spot light
+    vec3 worldCords = vec3(modelMatrix * vec4(vPos,1.0));
 
     vec3 spotLightDirection = vec3(0,-1,0);
-    float cutoffAngle = 0.4;
-
-    vec3 worldCords = vec3(mvpMatrix * vec4(vPos, 1.0));
+    float cutoffAngle = 0.99;
 
     vec3 lightDir3 = normalize(spotLightPosition - worldCords);
-
 
     float theta = dot(spotLightDirection, normalize(-lightDir3));
 
     if(theta > cutoffAngle){
         // diffuse shading
-        float diff2 = max(dot(vecNormal, lightDir3), 0.0);
+        float diff2 = max(dot(trueVecNormal, lightDir3), 0.0);
 
-        // combine results
-        vec3 ambient2  = vec3(1.0,1.0,1.0) * 0.5;
-        vec3 diffuse2  = lightColor * diff2;
-
+        // attenuation
         float distance2    = length(spotLightPosition - worldCords);
         float attenuation2 = 1.0 / (1 + 2 * distance2 +
                      1 * (distance2 * distance2));
-
+        // combine results
+        vec3 ambient2  = vec3(1.0,1.0,1.0) * 0.15;
+        vec3 diffuse2  = vec3(1.0,1.0,1.0) * diff2;
+        ambient2  *=  attenuation2 * 400;
         diffuse2  *= attenuation2 * 600;
 
-        color += 0 * (diffuse2 + ambient2);
+        color += (diffuse2 + ambient2);
     }
 
 

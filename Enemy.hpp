@@ -12,7 +12,7 @@
 
 class Enemy {
     public:
-        Enemy( GLuint shaderProgramHandle, GLint mvpMtxUniformLocation, GLint normalMtxUniformLocation, GLint materialColorUniformLocation );
+        Enemy( GLuint shaderProgramHandle, GLint mvpMtxUniformLocation, GLint normalMtxUniformLocation, GLint materialColorUniformLocation,GLint modelMatrixUniformLocation);
 
         void drawEnemy( glm::mat4 modelMtx, glm::mat4 viewMtx, glm::mat4 projMtx );
 
@@ -58,6 +58,8 @@ class Enemy {
             GLint normalMtx;
             /// \desc location of the material diffuse color
             GLint materialColor;
+
+            GLint modelMtx;
         } _shaderProgramUniformLocations;
 
         void _computeAndSendMatrixUniforms(glm::mat4 modelMtx, glm::mat4 viewMtx, glm::mat4 projMtx) const;

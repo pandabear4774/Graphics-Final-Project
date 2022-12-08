@@ -149,6 +149,7 @@ void A3Engine::_setupShaders() {
     _lightingShaderUniformLocations.lightDirection = _lightingShaderProgram->getUniformLocation("lightDir");
     _lightingShaderUniformLocations.lightColor     = _lightingShaderProgram->getUniformLocation("lightColor");
     _lightingShaderUniformLocations.spotlightPosition= _lightingShaderProgram->getUniformLocation("spotLightPosition");
+    _lightingShaderUniformLocations.modelMatrix     = _lightingShaderProgram->getUniformLocation("modelMatrix");
 
 
     _lightingShaderAttributeLocations.vPos         = _lightingShaderProgram->getAttributeLocation("vPos");
@@ -208,12 +209,12 @@ void A3Engine::_setupBuffers() {
     //place where the skybox images are stored
     std::string facesCubemap[6] =
             {
-                    "pictures/posx.jpg",
-                    "pictures/negx.jpg",
-                    "pictures/posy.jpg",
-                    "pictures/negy.jpg",
-                    "pictures/posz.jpg",
-                    "pictures/negz.jpg"
+                    "pictures/posx.png",
+                    "pictures/negx.png",
+                    "pictures/posy.png",
+                    "pictures/negy.png",
+                    "pictures/posz.png",
+                    "pictures/negz.png"
             };
 
 
@@ -269,14 +270,16 @@ void A3Engine::_setupBuffers() {
     _plane = new Plane(_lightingShaderProgram->getShaderProgramHandle(),
                        _lightingShaderUniformLocations.mvpMatrix,
                        _lightingShaderUniformLocations.normMtx,
-                       _lightingShaderUniformLocations.materialColor);
+                       _lightingShaderUniformLocations.materialColor,
+                       _lightingShaderUniformLocations.modelMatrix);
 
     //create the enemies
     for(int i = 0; i < 10; i++){
         enemies.push_back(new Enemy(_lightingShaderProgram->getShaderProgramHandle(),
                                _lightingShaderUniformLocations.mvpMatrix,
                                _lightingShaderUniformLocations.normMtx,
-                               _lightingShaderUniformLocations.materialColor));
+                               _lightingShaderUniformLocations.materialColor,
+                                    _lightingShaderUniformLocations.modelMatrix));
     }
 
     //create the coins
@@ -284,7 +287,8 @@ void A3Engine::_setupBuffers() {
         coins.push_back(new Coin(_lightingShaderProgram->getShaderProgramHandle(),
                                     _lightingShaderUniformLocations.mvpMatrix,
                                     _lightingShaderUniformLocations.normMtx,
-                                    _lightingShaderUniformLocations.materialColor));
+                                    _lightingShaderUniformLocations.materialColor,
+                                    _lightingShaderUniformLocations.modelMatrix));
     }
 
     _createGroundBuffers();
@@ -480,7 +484,7 @@ void A3Engine::_setupScene() {
 
 
     glm::vec3 lightDirection = glm::vec3(-1,-1,-1);
-    glm::vec3 lightColor = glm::vec3(1,1,1);
+    glm::vec3 lightColor = glm::vec3(0.5,0.5,0.5);
 
     glProgramUniform3fv(_lightingShaderProgram->getShaderProgramHandle(), _lightingShaderUniformLocations.lightDirection,1,&lightDirection[0]);
 
@@ -601,7 +605,7 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
     modelMtx = glm::rotate( modelMtx,  pie2, CSCI441::Y_AXIS );
     // draw our plane now
     glm::vec3 spotLight = _plane->_planeLocation;
-    spotLight.y = 30;
+    spotLight.y += 20;
     _lightingShaderProgram->setProgramUniform(_lightingShaderUniformLocations.spotlightPosition, spotLight);
 
 
@@ -650,7 +654,8 @@ void A3Engine::_updateScene() {
         enemies.push_back(new Enemy(_lightingShaderProgram->getShaderProgramHandle(),
                                     _lightingShaderUniformLocations.mvpMatrix,
                                     _lightingShaderUniformLocations.normMtx,
-                                    _lightingShaderUniformLocations.materialColor));
+                                    _lightingShaderUniformLocations.materialColor,
+                                    _lightingShaderUniformLocations.modelMatrix));
     }
 
     //make sure the camera is always following the plane

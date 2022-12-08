@@ -12,7 +12,7 @@
 
 class Coin {
 public:
-    Coin( GLuint shaderProgramHandle, GLint mvpMtxUniformLocation, GLint normalMtxUniformLocation, GLint materialColorUniformLocation );
+    Coin( GLuint shaderProgramHandle, GLint mvpMtxUniformLocation, GLint normalMtxUniformLocation, GLint materialColorUniformLocation, GLint );
 
     void drawCoin( glm::mat4 modelMtx, glm::mat4 viewMtx, glm::mat4 projMtx );
 
@@ -50,6 +50,8 @@ private:
         GLint normalMtx;
         /// \desc location of the material diffuse color
         GLint materialColor;
+
+        GLint modelMtx;
     } _shaderProgramUniformLocations;
 
     void _computeAndSendMatrixUniforms(glm::mat4 modelMtx, glm::mat4 viewMtx, glm::mat4 projMtx) const;

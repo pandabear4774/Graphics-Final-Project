@@ -12,7 +12,7 @@
 #endif
 using namespace std;
 
-Plane::Plane( GLuint shaderProgramHandle, GLint mvpMtxUniformLocation, GLint normalMtxUniformLocation, GLint materialColorUniformLocation) {
+Plane::Plane( GLuint shaderProgramHandle, GLint mvpMtxUniformLocation, GLint normalMtxUniformLocation, GLint materialColorUniformLocation, GLint modelMatrixUniformLocation) {
     _propAngle = 0.0f;
     _propAngleRotationSpeed = M_PI / 16.0f;
 
@@ -20,6 +20,7 @@ Plane::Plane( GLuint shaderProgramHandle, GLint mvpMtxUniformLocation, GLint nor
     _shaderProgramUniformLocations.mvpMtx           = mvpMtxUniformLocation;
     _shaderProgramUniformLocations.normalMtx        = normalMtxUniformLocation;
     _shaderProgramUniformLocations.materialColor    = materialColorUniformLocation;
+    _shaderProgramUniformLocations.modelMtx = modelMatrixUniformLocation;
 
     _rotatePlaneAngle = M_PI / 2.0f;
 
@@ -248,6 +249,7 @@ void Plane::_computeAndSendMatrixUniforms(glm::mat4 modelMtx, glm::mat4 viewMtx,
     glm::mat4 mvpMtx = projMtx * viewMtx * modelMtx;
     // then send it to the shader on the GPU to apply to every vertex
     glProgramUniformMatrix4fv( _shaderProgramHandle, _shaderProgramUniformLocations.mvpMtx, 1, GL_FALSE, &mvpMtx[0][0] );
+    glProgramUniformMatrix4fv( _shaderProgramHandle, _shaderProgramUniformLocations.modelMtx, 1, GL_FALSE, &modelMtx[0][0] );
     modelMtx = glm::translate(modelMtx, glm::vec3(0.0f, 20.0f, 0.0f));
 
     glm::mat3 normalMtx = glm::mat3( glm::transpose( glm::inverse( modelMtx )));
