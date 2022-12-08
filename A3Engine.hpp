@@ -133,6 +133,7 @@ private:
     GLuint _particleIBO[1];
     GLsizei _numParticlePoints[1];
     GLfloat _particleSystemAngle;
+    GLfloat* _distances;
     /// \desc stores the locations of all of our shader uniforms
     struct BillboardShaderProgramUniforms {
         /// \desc the ModelView Matrix to apply
