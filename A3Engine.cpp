@@ -140,6 +140,17 @@ void A3Engine::_setupOpenGL() {
 }
 
 void A3Engine::_setupShaders() {
+    _billboardShaderProgram = new CSCI441::ShaderProgram( "shaders/billboardQuadShader.v.glsl",
+                                                          "shaders/billboardQuadShader.g.glsl",
+                                                          "shaders/billboardQuadShader.f.glsl" );
+    _billboardShaderProgramUniforms.mvMatrix            = _billboardShaderProgram->getUniformLocation( "mvMatrix");
+    _billboardShaderProgramUniforms.projMatrix          = _billboardShaderProgram->getUniformLocation( "projMatrix");
+    _billboardShaderProgramUniforms.image               = _billboardShaderProgram->getUniformLocation( "image");
+    // get attribute locations
+    _billboardShaderProgramAttributes.vPos              = _billboardShaderProgram->getAttributeLocation( "vPos");
+    // set static uniforms
+    _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.image, 0 );
+
     //all the lighting shaders are setup
     _lightingShaderProgram = new CSCI441::ShaderProgram("shaders/lab05.v.glsl", "shaders/lab05.f.glsl" );
     _lightingShaderUniformLocations.mvpMatrix      = _lightingShaderProgram->getUniformLocation("mvpMatrix");
@@ -186,6 +197,29 @@ void A3Engine::_setupShaders() {
 }
 
 void A3Engine::_setupBuffers() {
+    _deathParticles = (glm::vec3*)malloc(sizeof(glm::vec3) * 25);
+    _deathParticleDirection = (glm::vec3*)malloc(sizeof(glm::vec3) * 25);
+    _deathParticleIndices = (GLushort*)malloc(sizeof(GLushort) * 25);
+    glGenVertexArrays(1, _particleVAO);
+    glGenBuffers(1, _particleVBO);
+    glGenBuffers(1, _particleIBO);
+    _numParticlePoints[0] = 25;
+    for (int i = 0; i < 25; i++){
+        GLfloat MAX = 1.0;
+        glm::vec3 pos(rand() / (GLfloat)RAND_MAX * MAX * 2.0 - MAX, rand() / (GLfloat)RAND_MAX * MAX * 2.0 - MAX, rand() / (GLfloat)RAND_MAX * MAX * 2.0 - MAX);
+        _deathParticles[i] = pos;
+        _deathParticleIndices[i] = i;
+    }
+    glBindVertexArray(_particleVAO[0]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, _particleVBO[0]);
+    glBufferData( GL_ARRAY_BUFFER, _numParticlePoints[0] * sizeof(glm::vec3), _deathParticles, GL_STATIC_DRAW );
+
+    glEnableVertexAttribArray( _billboardShaderProgramAttributes.vPos );
+    glVertexAttribPointer( _billboardShaderProgramAttributes.vPos, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0 );
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _particleIBO[0]);
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, _numParticlePoints[0] * sizeof(GLushort), _deathParticleIndices, GL_STATIC_DRAW );
 
     // Create VAO, VBO, and EBO for the skybox
     glGenVertexArrays(1, &skyboxVAO);
@@ -263,6 +297,8 @@ void A3Engine::_setupBuffers() {
     _texHandles[TEXTURE_ID::METAL] = _loadAndRegisterTexture("metal.jpg");
 
     _texHandles[TEXTURE_ID::MINES] = _loadAndRegisterTexture("mines.png");
+
+    _texHandles[TEXTURE_ID::SNOWFLAKE] = _loadAndRegisterTexture("snowflake.png");
 
 
     CSCI441::setVertexAttributeLocations( _lightingShaderAttributeLocations.vPos,  _lightingShaderAttributeLocations.vecNormal);
@@ -548,9 +584,26 @@ void A3Engine::_cleanupBuffers() {
 // Rendering / Drawing Functions - this is where the magic happens!
 
 void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
+    if (_plane->dead){
+        _billboardShaderProgram->useProgram();
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), _plane->_planeLocation);
+        modelMatrix = glm::rotate(modelMatrix, _particleSystemAngle, CSCI441::Y_AXIS);
+        glm::mat4 mvMatrix = viewMtx * modelMatrix;
+
+        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.mvMatrix, mvMatrix );
+        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.projMatrix, projMtx );
+
+        glBindVertexArray( _particleVAO[0] );
+        glBindTexture(GL_TEXTURE_2D, _texHandles[TEXTURE_ID::SNOWFLAKE]);
+
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _particleIBO[0] );
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * 25, _deathParticleIndices);
+        glDrawElements( GL_POINTS, _numParticlePoints[0], GL_UNSIGNED_SHORT, (void*)0 );
+    }
+
+
 
     _skyboxShaderProgram->useProgram();
-
     // We make the mat4 into a mat3 and then a mat4 again in order to get rid of the last row and column
     // The last row and column affect the translation of the skybox (which we don't want to affect)
     _skyboxShaderProgram->setProgramUniform(_skyboxShaderProgramUniformLocations.proj, projMtx);
@@ -648,6 +701,10 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
 }
 
 void A3Engine::_updateScene() {
+    _particleSystemAngle += 0.01f;
+    if(_particleSystemAngle >= 6.28f) {
+        _particleSystemAngle -= 6.28f;
+    }
     //every 100 frames we want to create a new enemy to increase the difficulty
     timer++;
     if(timer % 100 == 0){

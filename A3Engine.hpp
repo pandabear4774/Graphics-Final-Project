@@ -123,6 +123,31 @@ private:
     /// \desc generates building information to make up our scene
     void _generateEnvironment();
 
+    /// \desc death particle billboard shader
+    CSCI441::ShaderProgram* _billboardShaderProgram = nullptr;
+    glm::vec3* _deathParticles = nullptr;
+    glm::vec3* _deathParticleDirection = nullptr;
+    GLushort* _deathParticleIndices = nullptr;
+    GLuint _particleVAO[1];
+    GLuint _particleVBO[1];
+    GLuint _particleIBO[1];
+    GLsizei _numParticlePoints[1];
+    GLfloat _particleSystemAngle;
+    /// \desc stores the locations of all of our shader uniforms
+    struct BillboardShaderProgramUniforms {
+        /// \desc the ModelView Matrix to apply
+        GLint mvMatrix;
+        /// \desc the Projection Matrix to apply
+        GLint projMatrix;
+        /// \desc the texture to apply
+        GLint image;
+    } _billboardShaderProgramUniforms;
+    /// \desc stores the locations of all of our shader attributes
+    struct BillboardShaderProgramAttributes {
+        /// \desc the vertex position
+        GLint vPos;
+    } _billboardShaderProgramAttributes;
+
     /// \desc shader program that performs lighting
     CSCI441::ShaderProgram* _lightingShaderProgram = nullptr;   // the wrapper for our shader program
     /// \desc stores the locations of all of our shader uniforms
@@ -197,7 +222,9 @@ private:
         /// \desc metal texture
         METAL = 0,
         /// \desc Mines logo texture
-        MINES = 1
+        MINES = 1,
+        /// \desc snowflake texture
+        SNOWFLAKE = 2
     };
     /// \desc texture handles for our textures
     GLuint _texHandles[NUM_TEXTURES];
