@@ -172,6 +172,19 @@ private:
 
     } _textureShaderAttributeLocations;
 
+    CSCI441::ShaderProgram* _skyboxShaderProgram = nullptr;
+    struct SkyboxShaderProgramUniformLocations {
+        /// \desc precomputed MVP matrix location
+        GLint view;
+        /// \desc the color to apply location
+        GLint proj;
+
+        GLint skybox;
+    } _skyboxShaderProgramUniformLocations;
+
+    unsigned int cubemapTexture;
+    unsigned int skyboxVAO, skyboxVBO, skyboxEBO;
+
 
     int NUM_STRIPS;
     int NUM_VERTS_PER_STRIP;
