@@ -165,6 +165,8 @@ private:
 
         GLuint normMtx;
 
+        GLuint time;
+
         GLuint spotlightPosition;
 
         GLuint modelMatrix;
@@ -189,6 +191,8 @@ private:
         /// \desc precomputed MVP matrix location
         GLint mvpMatrix;
 
+        GLuint time;
+
         GLuint textMap;
 
     } _textureShaderUniformLocations;
@@ -210,6 +214,8 @@ private:
         GLint view;
         /// \desc the color to apply location
         GLint proj;
+
+        GLuint time;
 
         GLint skybox;
     } _skyboxShaderProgramUniformLocations;

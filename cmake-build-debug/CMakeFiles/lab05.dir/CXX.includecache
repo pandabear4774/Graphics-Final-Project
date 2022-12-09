@@ -36,28 +36,10 @@ Plane.hpp
 vector
 -
 
-/Users/kurtain/Desktop/Kurtain_A5/src/CameraRound.cpp
-CameraRound.h
-/Users/kurtain/Desktop/Kurtain_A5/src/CameraRound.h
-cmath
--
-iostream
--
-
 /Users/kurtain/Desktop/Kurtain_A5/src/CameraRound.h
 CSCI441/Camera.hpp
 -
 
-/Users/kurtain/Desktop/Kurtain_A5/src/Coin.cpp
-Coin.hpp
-/Users/kurtain/Desktop/Kurtain_A5/src/Coin.hpp
-glm/gtc/matrix_transform.hpp
--
-CSCI441/objects.hpp
--
-CSCI441/OpenGLUtils.hpp
--
-
 /Users/kurtain/Desktop/Kurtain_A5/src/Coin.hpp
 vector
 -
@@ -68,32 +50,10 @@ DeathParticle.hpp
 glm/glm.hpp
 -
 
-/Users/kurtain/Desktop/Kurtain_A5/src/DeathParticle.cpp
-DeathParticle.hpp
-/Users/kurtain/Desktop/Kurtain_A5/src/DeathParticle.hpp
-glm/gtc/matrix_transform.hpp
--
-iostream
--
-CSCI441/objects.hpp
--
-CSCI441/OpenGLUtils.hpp
--
-
 /Users/kurtain/Desktop/Kurtain_A5/src/DeathParticle.hpp
 GL/glew.h
 -
 glm/glm.hpp
--
-
-/Users/kurtain/Desktop/Kurtain_A5/src/Enemy.cpp
-Enemy.hpp
-/Users/kurtain/Desktop/Kurtain_A5/src/Enemy.hpp
-glm/gtc/matrix_transform.hpp
--
-CSCI441/objects.hpp
--
-CSCI441/OpenGLUtils.hpp
 -
 
 /Users/kurtain/Desktop/Kurtain_A5/src/Enemy.hpp
@@ -106,20 +66,6 @@ DeathParticle.hpp
 glm/glm.hpp
 -
 
-/Users/kurtain/Desktop/Kurtain_A5/src/Plane.cpp
-Plane.hpp
-/Users/kurtain/Desktop/Kurtain_A5/src/Plane.hpp
-DeathParticle.hpp
-/Users/kurtain/Desktop/Kurtain_A5/src/DeathParticle.hpp
-glm/gtc/matrix_transform.hpp
--
-CSCI441/objects.hpp
--
-iostream
--
-CSCI441/OpenGLUtils.hpp
--
-
 /Users/kurtain/Desktop/Kurtain_A5/src/Plane.hpp
 GL/glew.h
 -
@@ -129,12 +75,6 @@ glm/glm.hpp
 -
 DeathParticle.hpp
 /Users/kurtain/Desktop/Kurtain_A5/src/DeathParticle.hpp
-
-/Users/kurtain/Desktop/Kurtain_A5/src/main.cpp
-A3Engine.hpp
-/Users/kurtain/Desktop/Kurtain_A5/src/A3Engine.hpp
-stb_image.h
--
 
 /usr/local/include/CSCI441/Camera.hpp
 GL/glew.h

@@ -2,6 +2,7 @@
 
 // uniform inputs
 uniform sampler2D textureMap;
+uniform float time;
 
 // varying inputs
 in vec2 fragTextureCord;
@@ -22,5 +23,10 @@ void main() {
     fragColor = fragColor * rand(fragTextureCord);
     fragColor.w = 1.0f;
 
-    fragColorOut = fragColor;
+    float timeComponent = sin(time) + 0.8;
+    if(timeComponent > 1){
+        timeComponent = 1;
+    }
+
+    fragColorOut = fragColor * timeComponent;
 }

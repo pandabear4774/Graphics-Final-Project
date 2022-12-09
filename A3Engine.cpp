@@ -159,7 +159,7 @@ void A3Engine::_setupShaders() {
     _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.image, 0 );
 
     //all the lighting shaders are setup
-    _lightingShaderProgram = new CSCI441::ShaderProgram("shaders/lab05.v.glsl", "shaders/lab05.f.glsl" );
+    _lightingShaderProgram = new CSCI441::ShaderProgram("shaders/objectShader.v.glsl", "shaders/objectShader.f.glsl" );
     _lightingShaderUniformLocations.mvpMatrix      = _lightingShaderProgram->getUniformLocation("mvpMatrix");
     _lightingShaderUniformLocations.materialColor  = _lightingShaderProgram->getUniformLocation("materialColor");
 
@@ -168,6 +168,7 @@ void A3Engine::_setupShaders() {
     _lightingShaderUniformLocations.lightColor     = _lightingShaderProgram->getUniformLocation("lightColor");
     _lightingShaderUniformLocations.spotlightPosition= _lightingShaderProgram->getUniformLocation("spotLightPosition");
     _lightingShaderUniformLocations.modelMatrix     = _lightingShaderProgram->getUniformLocation("modelMatrix");
+    _lightingShaderUniformLocations.time     = _lightingShaderProgram->getUniformLocation("time");
 
 
     _lightingShaderAttributeLocations.vPos         = _lightingShaderProgram->getAttributeLocation("vPos");
@@ -176,10 +177,12 @@ void A3Engine::_setupShaders() {
 
 
 
-    _textureShaderProgram = new CSCI441::ShaderProgram("shaders/lab06.v.glsl", "shaders/lab06.f.glsl" );
+    _textureShaderProgram = new CSCI441::ShaderProgram("shaders/terrainShader.v.glsl", "shaders/terrainShader.f.glsl" );
     // query uniform locations
     _textureShaderUniformLocations.mvpMatrix      = _textureShaderProgram->getUniformLocation("mvpMatrix");
     _textureShaderUniformLocations.textMap = _textureShaderProgram->getUniformLocation("textureMap");
+    _textureShaderUniformLocations.time = _textureShaderProgram->getUniformLocation("time");
+
 
     // query attribute locations
     _textureShaderAttributeLocations.vPos         = _textureShaderProgram->getAttributeLocation("vPos");
@@ -200,6 +203,7 @@ void A3Engine::_setupShaders() {
     _skyboxShaderProgramUniformLocations.proj             = _skyboxShaderProgram->getUniformLocation("projection");
     _skyboxShaderProgramUniformLocations.view                 = _skyboxShaderProgram->getUniformLocation("view");
     _skyboxShaderProgramUniformLocations.skybox = _skyboxShaderProgram->getUniformLocation("skybox");
+    _skyboxShaderProgramUniformLocations.time = _skyboxShaderProgram->getUniformLocation("time");
 
 }
 
@@ -599,6 +603,9 @@ void A3Engine::_cleanupBuffers() {
 // Rendering / Drawing Functions - this is where the magic happens!
 
 void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
+    float time = (float)timer / 100.0;
+
+
     if (_plane->dead){
         _billboardShaderProgram->useProgram();
         glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), _plane->_planeLocation);
@@ -642,6 +649,8 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
 
 
     _skyboxShaderProgram->useProgram();
+    _skyboxShaderProgram->setProgramUniform(_skyboxShaderProgramUniformLocations.time, time);
+
     // We make the mat4 into a mat3 and then a mat4 again in order to get rid of the last row and column
     // The last row and column affect the translation of the skybox (which we don't want to affect)
     _skyboxShaderProgram->setProgramUniform(_skyboxShaderProgramUniformLocations.proj, projMtx);
@@ -656,10 +665,10 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
-
     //// START DRAWING THE GROUND PLANE ////
 
     _textureShaderProgram->useProgram();
+    _textureShaderProgram->setProgramUniform(_textureShaderUniformLocations.time, time);
 
     glm::mat4 mvpMtx = projMtx * viewMtx * glm::mat4(1.0f);
     _textureShaderProgram->setProgramUniform(_textureShaderUniformLocations.mvpMatrix, mvpMtx);
@@ -681,6 +690,7 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
 
 
     _lightingShaderProgram->useProgram();
+    _lightingShaderProgram->setProgramUniform(_lightingShaderUniformLocations.time, time);
 
 
     //// END DRAWING THE GROUND PLANE ////
