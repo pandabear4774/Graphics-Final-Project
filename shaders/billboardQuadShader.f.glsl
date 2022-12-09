@@ -23,7 +23,6 @@ uniform float time;
 // ***** FRAGMENT SHADER INPUT *****
 // TODO #J add varying input
 in vec2 texco;
-
 // ***** FRAGMENT SHADER OUTPUT *****
 out vec4 fragColorOut;
 
@@ -33,6 +32,7 @@ out vec4 fragColorOut;
 
 // ***** FRAGMENT SHADER MAIN FUNCTION *****
 void main() {
-    // TODO #K perform the texture lookup
+    float timeComponent = abs(sin(3.0 * time));
     fragColorOut = vec4(texture(image, texco));
+    fragColorOut.y = fragColorOut.y * timeComponent;
 }

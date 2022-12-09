@@ -153,6 +153,7 @@ void A3Engine::_setupShaders() {
     _billboardShaderProgramUniforms.mvMatrix            = _billboardShaderProgram->getUniformLocation( "mvMatrix");
     _billboardShaderProgramUniforms.projMatrix          = _billboardShaderProgram->getUniformLocation( "projMatrix");
     _billboardShaderProgramUniforms.image               = _billboardShaderProgram->getUniformLocation( "image");
+    _billboardShaderProgramUniforms.time                = _billboardShaderProgram->getUniformLocation("time");
     // get attribute locations
     _billboardShaderProgramAttributes.vPos              = _billboardShaderProgram->getAttributeLocation( "vPos");
     // set static uniforms
@@ -706,9 +707,12 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
         }
 
     }
+    //// END DRAWING THE COINS ????
 
+    //// BEGIN DRAWING DEATH PARTICLES ////
     if (_plane->dead){
         _billboardShaderProgram->useProgram();
+        _billboardShaderProgram->setProgramUniform(_billboardShaderProgramUniforms.time, time);
         glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), _plane->_planeLocation);
         modelMatrix = glm::rotate(modelMatrix, _particleSystemAngle, CSCI441::Y_AXIS);
         glm::mat4 mvMatrix = viewMtx * modelMatrix;
@@ -983,7 +987,10 @@ void A3Engine::_updateScene() {
         }
 
     } else {
-        timer = 1;
+        if ((float)timer / 100 > 3){
+            timer = 1;
+        }
+        timer++;
         //if plane is dead update particles and then reset the enemy locations
         _plane->checkDead();
         if(_plane->dead == false){
