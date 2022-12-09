@@ -102,8 +102,15 @@ void A3Engine::handleCursorPositionEvent(glm::vec2 currMousePosition) {
         _mousePosition = currMousePosition;
     }
 
-    _freeCam->rotate((currMousePosition.x - _mousePosition.x) * 0.005f,
-                     (_mousePosition.y - currMousePosition.y) * 0.005f );
+    if (_currCam == 0) {
+        _freeCam->rotate((currMousePosition.x - _mousePosition.x) * 0.005f,
+                         (_mousePosition.y - currMousePosition.y) * 0.005f);
+    }
+
+    if (_currCam == 1) {
+        _freeCam2->rotate((currMousePosition.x - _mousePosition.x) * 0.005f,
+                         (_mousePosition.y - currMousePosition.y) * 0.005f);
+    }
 
     if(_freeCam->getPhi() > 1.4){
         _freeCam->setPhi(1.4);
@@ -476,7 +483,7 @@ void A3Engine::_generateEnvironment() {
     const GLfloat TOP_END_POINT = GRID_LENGTH / 2.0f + 5.0f;
     //******************************************************************
 
-    srand( time(0) );                                                   // seed our RNG
+    //srand( time(0) );                                                   // seed our RNG
 
     // psych! everything's on a grid.
     for(int i = LEFT_END_POINT; i < RIGHT_END_POINT; i += GRID_SPACING_WIDTH) {
@@ -513,6 +520,13 @@ void A3Engine::_setupScene() {
     _freeCam->setTheta( -M_PI / 2.0f);
     _freeCam->setPhi( M_PI / 2.8f );
     _freeCam->zoom = 8;
+
+    _freeCam2 = new CSCI441::FreeCam();
+    _freeCam2->setPosition(glm::vec3(60.0f, 5.0f, 30.0f));
+    _freeCam2->setLookAtPoint(glm::vec3(55.0f, 5.0f, 30.0f));
+    _freeCam2->setTheta( -M_PI / 2.0f );
+    _freeCam2->setPhi( M_PI / 2.8f );
+    _freeCam2->recomputeOrientation();
 
     _plane->_planeLocation = glm::vec3(0,0,0);
     _plane->_direction = -M_PI;
@@ -725,6 +739,18 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
 }
 
 void A3Engine::_updateScene() {
+
+    //Change cameras
+    if(_keys[GLFW_KEY_1]) {
+        _currCam = 0;
+    }
+    if(_keys[GLFW_KEY_2]) {
+        _currCam = 1;
+        _freeCam2->setPosition(_freeCam->getLookAtPoint()+glm::vec3(0.0f,2.0f,0.0f));
+        _freeCam2->recomputeOrientation();
+    }
+
+
     _particleSystemAngle += 0.01f;
     if(_particleSystemAngle >= 6.28f) {
         _particleSystemAngle -= 6.28f;
@@ -816,28 +842,28 @@ void A3Engine::_updateScene() {
 
         //for all WASD set the fact it is moving to true then perform the action and update the camera location
         //move right
-        if( _keys[GLFW_KEY_D] ) {
+        if( _keys[GLFW_KEY_D] && _currCam == 0) {
             move = true;
             _plane->flyRight();
             _freeCam->updateLocation(_plane->_planeLocation);
             right = true;
         }
         // move left
-        if( _keys[GLFW_KEY_A] ) {
+        if( _keys[GLFW_KEY_A] && _currCam == 0) {
             move = true;
             _plane->flyLeft();
             _freeCam->updateLocation(_plane->_planeLocation);
             left = true;
         }
         // move up
-        if( _keys[GLFW_KEY_W] ) {
+        if( _keys[GLFW_KEY_W] && _currCam == 0) {
             move = true;
             _plane->flyForward();
             _freeCam->updateLocation(_plane->_planeLocation);
             up = true;
         }
         // move down
-        if( _keys[GLFW_KEY_S] ) {
+        if( _keys[GLFW_KEY_S] && _currCam == 0) {
             move = true;
             _plane->flyBackward();
             _freeCam->updateLocation(_plane->_planeLocation);
@@ -941,6 +967,18 @@ void A3Engine::_updateScene() {
         }
     }
 
+    if(_currCam == 1) {
+        //for all WASD set the fact it is moving to true then perform the action and update the camera location
+        // move forward
+        if( _keys[GLFW_KEY_W] ) {
+            _freeCam2->moveForward(0.2f);
+        }
+        // move backward
+        if( _keys[GLFW_KEY_S] ) {
+            _freeCam2->moveBackward(0.2f);
+        }
+    }
+
     //win once there are no coins left
     if(coins.size() == 0){
         cout << "YOU WIN" << endl;
@@ -970,7 +1008,13 @@ void A3Engine::run() {
         glm::mat4 projectionMatrix = glm::perspective( 45.0f, (GLfloat) framebufferWidth / (GLfloat) framebufferHeight, 0.001f, 1000.0f );
 
         // set up our look at matrix to position our camera
-        glm::mat4 viewMatrix = _freeCam->getViewMatrix();
+        glm::mat4 viewMatrix;
+        if(_currCam == 0) {
+            viewMatrix = _freeCam->getViewMatrix();
+        }
+        if(_currCam == 1) {
+            viewMatrix = _freeCam2->getViewMatrix();
+        }
 
         // draw everything to the window
         _renderScene(viewMatrix, projectionMatrix);

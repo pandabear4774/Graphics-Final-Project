@@ -47,6 +47,11 @@ public:
 
     ///have a free cam variable which is actually an arcball camera
     CameraRound* _freeCam;
+
+    CSCI441::FreeCam* _freeCam2;
+
+    int _currCam = 0;
+
 private:
     void _setupGLFW() final;
     void _setupOpenGL() final;

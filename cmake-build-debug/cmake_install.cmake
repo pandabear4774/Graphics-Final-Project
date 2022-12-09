@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/Colby/Documents/fall 2022/csci441/Graphics-Final-Project
+# Install script for directory: C:/CSCI441/Final Project/Graphics-Final-Project
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -32,11 +32,6 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
-# Set default install directory permissions.
-if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "C:/Program Files/JetBrains/CLion 2022.2.3/bin/mingw/bin/objdump.exe")
-endif()
-
 if(CMAKE_INSTALL_COMPONENT)
   set(CMAKE_INSTALL_MANIFEST "install_manifest_${CMAKE_INSTALL_COMPONENT}.txt")
 else()
@@ -45,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/Colby/Documents/fall 2022/csci441/Graphics-Final-Project/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/CSCI441/Final Project/Graphics-Final-Project/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
