@@ -4,19 +4,19 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "C:/CSCI441/Final Project/Graphics-Final-Project/A3Engine.cpp" "C:/CSCI441/Final Project/Graphics-Final-Project/cmake-build-debug/CMakeFiles/lab05.dir/A3Engine.cpp.obj"
-  "C:/CSCI441/Final Project/Graphics-Final-Project/CameraRound.cpp" "C:/CSCI441/Final Project/Graphics-Final-Project/cmake-build-debug/CMakeFiles/lab05.dir/CameraRound.cpp.obj"
-  "C:/CSCI441/Final Project/Graphics-Final-Project/Coin.cpp" "C:/CSCI441/Final Project/Graphics-Final-Project/cmake-build-debug/CMakeFiles/lab05.dir/Coin.cpp.obj"
-  "C:/CSCI441/Final Project/Graphics-Final-Project/DeathParticle.cpp" "C:/CSCI441/Final Project/Graphics-Final-Project/cmake-build-debug/CMakeFiles/lab05.dir/DeathParticle.cpp.obj"
-  "C:/CSCI441/Final Project/Graphics-Final-Project/Enemy.cpp" "C:/CSCI441/Final Project/Graphics-Final-Project/cmake-build-debug/CMakeFiles/lab05.dir/Enemy.cpp.obj"
-  "C:/CSCI441/Final Project/Graphics-Final-Project/Plane.cpp" "C:/CSCI441/Final Project/Graphics-Final-Project/cmake-build-debug/CMakeFiles/lab05.dir/Plane.cpp.obj"
-  "C:/CSCI441/Final Project/Graphics-Final-Project/main.cpp" "C:/CSCI441/Final Project/Graphics-Final-Project/cmake-build-debug/CMakeFiles/lab05.dir/main.cpp.obj"
+  "/Users/kurtain/Desktop/Kurtain_A5/src/A3Engine.cpp" "/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/lab05.dir/A3Engine.cpp.o"
+  "/Users/kurtain/Desktop/Kurtain_A5/src/CameraRound.cpp" "/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/lab05.dir/CameraRound.cpp.o"
+  "/Users/kurtain/Desktop/Kurtain_A5/src/Coin.cpp" "/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/lab05.dir/Coin.cpp.o"
+  "/Users/kurtain/Desktop/Kurtain_A5/src/DeathParticle.cpp" "/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/lab05.dir/DeathParticle.cpp.o"
+  "/Users/kurtain/Desktop/Kurtain_A5/src/Enemy.cpp" "/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/lab05.dir/Enemy.cpp.o"
+  "/Users/kurtain/Desktop/Kurtain_A5/src/Plane.cpp" "/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/lab05.dir/Plane.cpp.o"
+  "/Users/kurtain/Desktop/Kurtain_A5/src/main.cpp" "/Users/kurtain/Desktop/Kurtain_A5/src/cmake-build-debug/CMakeFiles/lab05.dir/main.cpp.o"
   )
-set(CMAKE_CXX_COMPILER_ID "GNU")
+set(CMAKE_CXX_COMPILER_ID "AppleClang")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "C:/CSCI441/include"
+  "/usr/local/include"
   )
 
 # Targets to which this target links.
