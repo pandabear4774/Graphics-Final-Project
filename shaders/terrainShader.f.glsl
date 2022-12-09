@@ -24,8 +24,8 @@ void main() {
     fragColor.w = 1.0f;
 
     float timeComponent = sin(time) + 0.8;
-    if(timeComponent > 1){
-        timeComponent = 1;
+    if(timeComponent > 1.0){
+        timeComponent = 1.0;
     }
 
     fragColorOut = fragColor * timeComponent;

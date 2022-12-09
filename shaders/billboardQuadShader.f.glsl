@@ -32,6 +32,7 @@ out vec4 fragColorOut;
 
 // ***** FRAGMENT SHADER MAIN FUNCTION *****
 void main() {
+    //animate the texture going in and out of redshift
     float timeComponent = abs(sin(3.0 * time));
     fragColorOut = vec4(texture(image, texco));
     fragColorOut.y = fragColorOut.y * timeComponent;

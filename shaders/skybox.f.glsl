@@ -10,8 +10,8 @@ uniform float time;
 void main()
 {
     float timeComponent = sin(time) + 0.75;
-    if(timeComponent > 1){
-        timeComponent = 1;
+    if(timeComponent > 1.0){
+        timeComponent = 1.0;
     }
     //maps the coloring in the texture to the correct spot
     FragColor = texture(skybox, texCoords) * timeComponent;
