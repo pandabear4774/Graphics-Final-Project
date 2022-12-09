@@ -19,7 +19,7 @@
 
 // ***** FRAGMENT SHADER UNIFORMS *****
 uniform sampler2D image;
-
+uniform float time;
 // ***** FRAGMENT SHADER INPUT *****
 // TODO #J add varying input
 in vec2 texco;
