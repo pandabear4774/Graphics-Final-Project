@@ -111,17 +111,17 @@ void Plane::moveLegs(){
     }
 
     //check to make sure that the plane is inside the bounds
-    if(_planeLocation.x > 55.0f){
-        dead = true;
+    if(_planeLocation.x > 54.0f){
+        _planeLocation.x = 54.0f;
     } else if(_planeLocation.x < -55.0f){
-        dead = true;
+        _planeLocation.x = -55.0f;
     }
 
     //make sure the z axis is also within the bounds
-    if(_planeLocation.z > 55.0f){
-        dead = true;
+    if(_planeLocation.z > 54.0f){
+        _planeLocation.z = 54.0f;
     } else if(_planeLocation.z < -55.0f){
-        dead = true;
+        _planeLocation.z = -55.0f;
     }
 }
 void Plane::spawnParticles() {

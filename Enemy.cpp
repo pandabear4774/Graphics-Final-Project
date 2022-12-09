@@ -25,22 +25,51 @@ void Enemy::update() {
     float mag = sqrt(_direction.x * _direction.x + _direction.z * _direction.z);
 
     _direction.x /= mag;
+    _direction.y = 0;
     _direction.z /= mag;
 
-    _position -= speed * 0.8f * _direction;
+    float angleSpeed = 0.015;
+
+    if(_currentAngle < _angle){
+        if(_angle - _currentAngle < M_PI){
+            _currentAngle += angleSpeed;
+        } else {
+            _currentAngle -= angleSpeed;
+        }
+
+    } else {
+        if(_currentAngle - _angle < M_PI){
+            _currentAngle -= angleSpeed;
+        } else {
+            _currentAngle += angleSpeed;
+        }
+    }
+
+    if(_currentAngle > 2*M_PI){
+        _currentAngle = _currentAngle - 2*M_PI;
+    }
+    if(_currentAngle < 0){
+        _currentAngle = _currentAngle + 2*M_PI;
+    }
+
+    _currentDirection = glm::vec3(cos(_currentAngle),0,sin(_currentAngle));
+
+    glm::normalize(_currentDirection);
+
+    _position += speed * 2 *  _currentDirection;
     _position.y = 0;
 
     //check to make sure that the plane is inside the bounds
-    if(_position.x > 55.0f){
+    if(_position.x > 55.0f - size){
         dead = true;
-    } else if(_position.x < -55.0f){
+    } else if(_position.x < -55.0f + size){
         dead = true;
     }
 
     //make sure the z axis is also within the bounds
-    if(_position.z > 55.0f){
+    if(_position.z > 55.0f - size){
         dead = true;
-    } else if(_position.z < -55.0f){
+    } else if(_position.z < -55.0f + size){
         dead = true;
     }
 
@@ -65,10 +94,12 @@ void Enemy::checkDead(){
 }
 void Enemy::relocate(){
     chainSawAngle = 0;
+    _currentAngle = 0;
+    _currentDirection = glm::vec3(0,0,0);
 
-    float x = 20 + rand() % 30;
+    float x = 10 + rand() % (int)(floor(43 - size));
     float y = 0.0f;
-    float z = 20 + rand() % 30;
+    float z = 10 + rand() % (int)(floor(43 - size));
 
     if(rand()% 2 == 0){
         x *= -1;
@@ -80,8 +111,10 @@ void Enemy::relocate(){
     _position = glm::vec3(x,y,z);
 }
 void Enemy::respawn() {
+    _currentDirection = glm::vec3(0,0,0);
     deathTimer = 0;
     dead = false;
+    _currentAngle = 0;
 
     size = 0.5f;
 
@@ -89,9 +122,9 @@ void Enemy::respawn() {
 
     chainSawAngle = 0;
 
-    float x = 20 + rand() % 30;
+    float x = 10 + rand() % (int)(floor(43 - size));
     float y = 0.0f;
-    float z = 20 + rand() % 30;
+    float z = 10 + rand() % (int)(floor(43 - size));
 
     if(rand()% 2 == 0){
         x *= -1;
@@ -118,7 +151,7 @@ void Enemy::spawnParticles() {
 void Enemy::drawEnemy(glm::mat4 modelMtx, glm::mat4 viewMtx, glm::mat4 projMtx) {
     glUseProgram( _shaderProgramHandle );
 
-    modelMtx = glm::rotate(modelMtx, -_angle, CSCI441::Y_AXIS);
+    modelMtx = glm::rotate(modelMtx, -_currentAngle, CSCI441::Y_AXIS);
 
     modelMtx = glm::translate(modelMtx, glm::vec3(0.0f, size, 0.0f));
 

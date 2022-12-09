@@ -233,6 +233,9 @@ void A3Engine::_setupBuffers() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _particleIBO[0]);
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, _numParticlePoints[0] * sizeof(GLushort), _deathParticleIndices, GL_STATIC_DRAW );
 
+    for(int i = 0; i < 24; i++){
+        skyboxVertices[i] *= 1.5;
+    }
     // Create VAO, VBO, and EBO for the skybox
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
@@ -789,6 +792,11 @@ void A3Engine::_updateScene() {
     //update all enemies and also check collisions with other enemies
     for(int i = 0; i < numEnemies; i++){
         if(enemies[i]->dead == false){
+            //calcute the angle they must rotate in order to face the hero
+            glm::vec3 vectorEnemyToHero = enemies[i]->_position - _plane->_planeLocation;
+            glm::vec3 origin = glm::vec3(1,0,0);
+            enemies[i]->_angle = atan2(vectorEnemyToHero.z,vectorEnemyToHero.x) - atan2(origin.z,origin.x) + M_PI;
+
             //update direction to face hero
             enemies[i]->_direction = enemies[i]->_position - _plane->_planeLocation;
 
@@ -800,10 +808,7 @@ void A3Engine::_updateScene() {
 
             enemies[i]->_position.y = height;
 
-            //calcute the angle they must rotate in order to face the hero
-            glm::vec3 vectorEnemyToHero = enemies[i]->_position - _plane->_planeLocation;
-            glm::vec3 origin = glm::vec3(1,0,0);
-            enemies[i]->_angle = atan2(vectorEnemyToHero.z,vectorEnemyToHero.x) - atan2(origin.z,origin.x) + M_PI;
+
         }
         //update particles if they are dead
         enemies[i]->checkDead();
@@ -811,6 +816,9 @@ void A3Engine::_updateScene() {
         //do enemy collision detection within eachother
         for(int j = 0; j < numEnemies; j++){
             if(j == i){
+                continue;
+            }
+            if(enemies[j]->dead){
                 continue;
             }
 
@@ -826,6 +834,14 @@ void A3Engine::_updateScene() {
             if(distance2 <= distance){
                 //make larger enemy grow larger and faster
                 enemies[i]->consumedCount += enemies[j]->consumedCount;
+
+                /*
+                if(enemies[i]->consumedCount > 25 && enemies[i]->consumedCount < 50){
+                    cout << "EASTER EGG: MEGA MODE" << endl;
+                    enemies[i]->consumedCount *= 2;
+                    _plane->size *= 1.5;
+                }
+                 */
                 enemies[i]->size = sqrt(enemies[i]->consumedCount / 2.0f);
                 enemies[i]->speed += 0.005;
 
@@ -968,6 +984,7 @@ void A3Engine::_updateScene() {
         }
 
     } else {
+        timer = 1;
         //if plane is dead update particles and then reset the enemy locations
         _plane->checkDead();
         if(_plane->dead == false){
