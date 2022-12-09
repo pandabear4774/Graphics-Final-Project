@@ -8,9 +8,9 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 if( ${CMAKE_SYSTEM_NAME} MATCHES "Windows" AND MINGW )
     # if working on Windows but not in the lab
     # update the include directory location
-    include_directories("C:/CSCI441/include")
+    include_directories("Z:/CSCI441/include")
     # update the lib directory location
-    target_link_directories(${PROJECT_NAME} PUBLIC "C:/CSCI441/lib")
+    target_link_directories(${PROJECT_NAME} PUBLIC "Z:/CSCI441/lib")
     target_link_libraries(${PROJECT_NAME} opengl32 glfw3 glew32.dll gdi32)
 # OS X Installations
 elseif( APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )

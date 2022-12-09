@@ -608,49 +608,6 @@ void A3Engine::_cleanupBuffers() {
 void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
     float time = (float)timer / 100.0;
 
-
-    if (_plane->dead){
-        _billboardShaderProgram->useProgram();
-        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), _plane->_planeLocation);
-        modelMatrix = glm::rotate(modelMatrix, _particleSystemAngle, CSCI441::Y_AXIS);
-        glm::mat4 mvMatrix = viewMtx * modelMatrix;
-
-        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.mvMatrix, mvMatrix );
-        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.projMatrix, projMtx );
-
-        glBindVertexArray( _particleVAO[0] );
-        glBindTexture(GL_TEXTURE_2D, _texHandles[TEXTURE_ID::SNOWFLAKE]);
-
-        glm::vec3 normalizedViewVector = _freeCam->getLookAtPoint() - _freeCam->getPosition();
-        for(int i = 0; i < 25; i++){
-            glm::vec4 currentSprite = glm::vec4(_deathParticles[_deathParticleIndices[i]],0);
-            glm::vec4 worldSpace = modelMatrix * currentSprite;
-            glm::vec3 point = worldSpace;
-            glm::vec3 ep = point - _freeCam->getPosition();
-            float vpLength = glm::dot(ep,normalizedViewVector);
-            _distances[i] = vpLength;
-        }
-        for(int i = 0; i < 25 - 1; i++){
-            float currentHighestDistance = _distances[i];
-            for(int j = i + 1; j < 25; j++){
-                if(_distances[j] > currentHighestDistance){
-                    _distances[i] = _distances[j];
-                    _distances[j] = currentHighestDistance;
-                    currentHighestDistance = _distances[i];
-                    int index = _deathParticleIndices[i];
-                    _deathParticleIndices[i] = _deathParticleIndices[j];
-                    _deathParticleIndices[j] = index;
-                }
-            }
-        }
-
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _particleIBO[0] );
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * 25, _deathParticleIndices);
-        glDrawElements( GL_POINTS, _numParticlePoints[0], GL_UNSIGNED_SHORT, (void*)0 );
-    }
-
-
-
     _skyboxShaderProgram->useProgram();
     _skyboxShaderProgram->setProgramUniform(_skyboxShaderProgramUniformLocations.time, time);
 
@@ -749,6 +706,48 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
         }
 
     }
+
+    if (_plane->dead){
+        _billboardShaderProgram->useProgram();
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), _plane->_planeLocation);
+        modelMatrix = glm::rotate(modelMatrix, _particleSystemAngle, CSCI441::Y_AXIS);
+        glm::mat4 mvMatrix = viewMtx * modelMatrix;
+
+        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.mvMatrix, mvMatrix );
+        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.projMatrix, projMtx );
+
+        glBindVertexArray( _particleVAO[0] );
+        glBindTexture(GL_TEXTURE_2D, _texHandles[TEXTURE_ID::SNOWFLAKE]);
+
+        glm::vec3 normalizedViewVector = _freeCam->getLookAtPoint() - _freeCam->getPosition();
+        for(int i = 0; i < 25; i++){
+            glm::vec4 currentSprite = glm::vec4(_deathParticles[_deathParticleIndices[i]],0);
+            glm::vec4 worldSpace = modelMatrix * currentSprite;
+            glm::vec3 point = worldSpace;
+            glm::vec3 ep = point - _freeCam->getPosition();
+            float vpLength = glm::dot(ep,normalizedViewVector);
+            _distances[i] = vpLength;
+        }
+        for(int i = 0; i < 25 - 1; i++){
+            float currentHighestDistance = _distances[i];
+            for(int j = i + 1; j < 25; j++){
+                if(_distances[j] > currentHighestDistance){
+                    _distances[i] = _distances[j];
+                    _distances[j] = currentHighestDistance;
+                    currentHighestDistance = _distances[i];
+                    int index = _deathParticleIndices[i];
+                    _deathParticleIndices[i] = _deathParticleIndices[j];
+                    _deathParticleIndices[j] = index;
+                }
+            }
+        }
+
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _particleIBO[0] );
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * 25, _deathParticleIndices);
+        glDepthMask(false);
+        glDrawElements( GL_POINTS, _numParticlePoints[0], GL_UNSIGNED_SHORT, (void*)0 );
+        glDepthMask(true);
+    }
 }
 
 void A3Engine::_updateScene() {
@@ -764,7 +763,7 @@ void A3Engine::_updateScene() {
     }
 
 
-    _particleSystemAngle += 0.01f;
+    _particleSystemAngle += 0.05f;
     if(_particleSystemAngle >= 6.28f) {
         _particleSystemAngle -= 6.28f;
     }
