@@ -19,11 +19,10 @@
 
 // ***** FRAGMENT SHADER UNIFORMS *****
 uniform sampler2D image;
-
+uniform float time;
 // ***** FRAGMENT SHADER INPUT *****
 // TODO #J add varying input
 in vec2 texco;
-
 // ***** FRAGMENT SHADER OUTPUT *****
 out vec4 fragColorOut;
 
@@ -33,6 +32,8 @@ out vec4 fragColorOut;
 
 // ***** FRAGMENT SHADER MAIN FUNCTION *****
 void main() {
-    // TODO #K perform the texture lookup
+    //animate the texture going in and out of redshift
+    float timeComponent = abs(sin(3.0 * time));
     fragColorOut = vec4(texture(image, texco));
+    fragColorOut.y = fragColorOut.y * timeComponent;
 }

@@ -44,6 +44,10 @@ class Enemy {
 
         float _angle;
 
+        float _currentAngle;
+
+        glm::vec3 _currentDirection;
+
         float speed;
     private:
         std::vector<DeathParticle> particles;

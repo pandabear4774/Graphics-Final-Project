@@ -2,6 +2,7 @@
 
 // uniform inputs
 uniform mat4 mvpMatrix;
+uniform float time;
 
 // attribute inputs
 in vec3 vPos;
@@ -12,16 +13,15 @@ in vec3 vNormal;
 // varying outputs
 out vec2 fragTextureCord;
 
-float rand(vec2 co){
-    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
-}
 
 void main() {
-    gl_Position = mvpMatrix * vec4(vPos, 1.0);
 
-    //fun experimentations:
-    //gl_Position.y = gl_Position.y * rand(vec2(vPos.x,vPos.z));
-
+    vec3 v = vPos;
+    //start moving the map after the time reaches 5
+    if (time > 5.0){
+        v.y = vPos.y + sin(time * 7 + vPos.x - vPos.z) / 2.0;
+    }
+    gl_Position = mvpMatrix * vec4(v, 1.0);
 
     vec3 normalVector = vNormal;
 

@@ -153,13 +153,14 @@ void A3Engine::_setupShaders() {
     _billboardShaderProgramUniforms.mvMatrix            = _billboardShaderProgram->getUniformLocation( "mvMatrix");
     _billboardShaderProgramUniforms.projMatrix          = _billboardShaderProgram->getUniformLocation( "projMatrix");
     _billboardShaderProgramUniforms.image               = _billboardShaderProgram->getUniformLocation( "image");
+    _billboardShaderProgramUniforms.time                = _billboardShaderProgram->getUniformLocation("time");
     // get attribute locations
     _billboardShaderProgramAttributes.vPos              = _billboardShaderProgram->getAttributeLocation( "vPos");
     // set static uniforms
     _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.image, 0 );
 
     //all the lighting shaders are setup
-    _lightingShaderProgram = new CSCI441::ShaderProgram("shaders/lab05.v.glsl", "shaders/lab05.f.glsl" );
+    _lightingShaderProgram = new CSCI441::ShaderProgram("shaders/objectShader.v.glsl", "shaders/objectShader.f.glsl" );
     _lightingShaderUniformLocations.mvpMatrix      = _lightingShaderProgram->getUniformLocation("mvpMatrix");
     _lightingShaderUniformLocations.materialColor  = _lightingShaderProgram->getUniformLocation("materialColor");
 
@@ -168,6 +169,7 @@ void A3Engine::_setupShaders() {
     _lightingShaderUniformLocations.lightColor     = _lightingShaderProgram->getUniformLocation("lightColor");
     _lightingShaderUniformLocations.spotlightPosition= _lightingShaderProgram->getUniformLocation("spotLightPosition");
     _lightingShaderUniformLocations.modelMatrix     = _lightingShaderProgram->getUniformLocation("modelMatrix");
+    _lightingShaderUniformLocations.time     = _lightingShaderProgram->getUniformLocation("time");
 
 
     _lightingShaderAttributeLocations.vPos         = _lightingShaderProgram->getAttributeLocation("vPos");
@@ -176,10 +178,12 @@ void A3Engine::_setupShaders() {
 
 
 
-    _textureShaderProgram = new CSCI441::ShaderProgram("shaders/lab06.v.glsl", "shaders/lab06.f.glsl" );
+    _textureShaderProgram = new CSCI441::ShaderProgram("shaders/terrainShader.v.glsl", "shaders/terrainShader.f.glsl" );
     // query uniform locations
     _textureShaderUniformLocations.mvpMatrix      = _textureShaderProgram->getUniformLocation("mvpMatrix");
     _textureShaderUniformLocations.textMap = _textureShaderProgram->getUniformLocation("textureMap");
+    _textureShaderUniformLocations.time = _textureShaderProgram->getUniformLocation("time");
+
 
     // query attribute locations
     _textureShaderAttributeLocations.vPos         = _textureShaderProgram->getAttributeLocation("vPos");
@@ -200,6 +204,7 @@ void A3Engine::_setupShaders() {
     _skyboxShaderProgramUniformLocations.proj             = _skyboxShaderProgram->getUniformLocation("projection");
     _skyboxShaderProgramUniformLocations.view                 = _skyboxShaderProgram->getUniformLocation("view");
     _skyboxShaderProgramUniformLocations.skybox = _skyboxShaderProgram->getUniformLocation("skybox");
+    _skyboxShaderProgramUniformLocations.time = _skyboxShaderProgram->getUniformLocation("time");
 
 }
 
@@ -229,6 +234,9 @@ void A3Engine::_setupBuffers() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _particleIBO[0]);
     glBufferData( GL_ELEMENT_ARRAY_BUFFER, _numParticlePoints[0] * sizeof(GLushort), _deathParticleIndices, GL_STATIC_DRAW );
 
+    for(int i = 0; i < 24; i++){
+        skyboxVertices[i] *= 1.5;
+    }
     // Create VAO, VBO, and EBO for the skybox
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
@@ -599,49 +607,11 @@ void A3Engine::_cleanupBuffers() {
 // Rendering / Drawing Functions - this is where the magic happens!
 
 void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
-    if (_plane->dead){
-        _billboardShaderProgram->useProgram();
-        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), _plane->_planeLocation);
-        modelMatrix = glm::rotate(modelMatrix, _particleSystemAngle, CSCI441::Y_AXIS);
-        glm::mat4 mvMatrix = viewMtx * modelMatrix;
-
-        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.mvMatrix, mvMatrix );
-        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.projMatrix, projMtx );
-
-        glBindVertexArray( _particleVAO[0] );
-        glBindTexture(GL_TEXTURE_2D, _texHandles[TEXTURE_ID::SNOWFLAKE]);
-
-        glm::vec3 normalizedViewVector = _freeCam->getLookAtPoint() - _freeCam->getPosition();
-        for(int i = 0; i < 25; i++){
-            glm::vec4 currentSprite = glm::vec4(_deathParticles[_deathParticleIndices[i]],0);
-            glm::vec4 worldSpace = modelMatrix * currentSprite;
-            glm::vec3 point = worldSpace;
-            glm::vec3 ep = point - _freeCam->getPosition();
-            float vpLength = glm::dot(ep,normalizedViewVector);
-            _distances[i] = vpLength;
-        }
-        for(int i = 0; i < 25 - 1; i++){
-            float currentHighestDistance = _distances[i];
-            for(int j = i + 1; j < 25; j++){
-                if(_distances[j] > currentHighestDistance){
-                    _distances[i] = _distances[j];
-                    _distances[j] = currentHighestDistance;
-                    currentHighestDistance = _distances[i];
-                    int index = _deathParticleIndices[i];
-                    _deathParticleIndices[i] = _deathParticleIndices[j];
-                    _deathParticleIndices[j] = index;
-                }
-            }
-        }
-
-        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _particleIBO[0] );
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * 25, _deathParticleIndices);
-        glDrawElements( GL_POINTS, _numParticlePoints[0], GL_UNSIGNED_SHORT, (void*)0 );
-    }
-
-
+    float time = (float)timer / 100.0;
 
     _skyboxShaderProgram->useProgram();
+    _skyboxShaderProgram->setProgramUniform(_skyboxShaderProgramUniformLocations.time, time);
+
     // We make the mat4 into a mat3 and then a mat4 again in order to get rid of the last row and column
     // The last row and column affect the translation of the skybox (which we don't want to affect)
     _skyboxShaderProgram->setProgramUniform(_skyboxShaderProgramUniformLocations.proj, projMtx);
@@ -656,10 +626,10 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
-
     //// START DRAWING THE GROUND PLANE ////
 
     _textureShaderProgram->useProgram();
+    _textureShaderProgram->setProgramUniform(_textureShaderUniformLocations.time, time);
 
     glm::mat4 mvpMtx = projMtx * viewMtx * glm::mat4(1.0f);
     _textureShaderProgram->setProgramUniform(_textureShaderUniformLocations.mvpMatrix, mvpMtx);
@@ -681,6 +651,7 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
 
 
     _lightingShaderProgram->useProgram();
+    _lightingShaderProgram->setProgramUniform(_lightingShaderUniformLocations.time, time);
 
 
     //// END DRAWING THE GROUND PLANE ////
@@ -736,6 +707,51 @@ void A3Engine::_renderScene(glm::mat4 viewMtx, glm::mat4 projMtx) const {
         }
 
     }
+    //// END DRAWING THE COINS ????
+
+    //// BEGIN DRAWING DEATH PARTICLES ////
+    if (_plane->dead){
+        _billboardShaderProgram->useProgram();
+        _billboardShaderProgram->setProgramUniform(_billboardShaderProgramUniforms.time, time);
+        glm::mat4 modelMatrix = glm::translate(glm::mat4(1.0f), _plane->_planeLocation);
+        modelMatrix = glm::rotate(modelMatrix, _particleSystemAngle, CSCI441::Y_AXIS);
+        glm::mat4 mvMatrix = viewMtx * modelMatrix;
+
+        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.mvMatrix, mvMatrix );
+        _billboardShaderProgram->setProgramUniform( _billboardShaderProgramUniforms.projMatrix, projMtx );
+
+        glBindVertexArray( _particleVAO[0] );
+        glBindTexture(GL_TEXTURE_2D, _texHandles[TEXTURE_ID::SNOWFLAKE]);
+
+        glm::vec3 normalizedViewVector = _freeCam->getLookAtPoint() - _freeCam->getPosition();
+        for(int i = 0; i < 25; i++){
+            glm::vec4 currentSprite = glm::vec4(_deathParticles[_deathParticleIndices[i]],0);
+            glm::vec4 worldSpace = modelMatrix * currentSprite;
+            glm::vec3 point = worldSpace;
+            glm::vec3 ep = point - _freeCam->getPosition();
+            float vpLength = glm::dot(ep,normalizedViewVector);
+            _distances[i] = vpLength;
+        }
+        for(int i = 0; i < 25 - 1; i++){
+            float currentHighestDistance = _distances[i];
+            for(int j = i + 1; j < 25; j++){
+                if(_distances[j] > currentHighestDistance){
+                    _distances[i] = _distances[j];
+                    _distances[j] = currentHighestDistance;
+                    currentHighestDistance = _distances[i];
+                    int index = _deathParticleIndices[i];
+                    _deathParticleIndices[i] = _deathParticleIndices[j];
+                    _deathParticleIndices[j] = index;
+                }
+            }
+        }
+
+        glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _particleIBO[0] );
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(GLushort) * 25, _deathParticleIndices);
+        glDepthMask(false);
+        glDrawElements( GL_POINTS, _numParticlePoints[0], GL_UNSIGNED_SHORT, (void*)0 );
+        glDepthMask(true);
+    }
 }
 
 void A3Engine::_updateScene() {
@@ -751,7 +767,7 @@ void A3Engine::_updateScene() {
     }
 
 
-    _particleSystemAngle += 0.01f;
+    _particleSystemAngle += 0.05f;
     if(_particleSystemAngle >= 6.28f) {
         _particleSystemAngle -= 6.28f;
     }
@@ -779,6 +795,11 @@ void A3Engine::_updateScene() {
     //update all enemies and also check collisions with other enemies
     for(int i = 0; i < numEnemies; i++){
         if(enemies[i]->dead == false){
+            //calcute the angle they must rotate in order to face the hero
+            glm::vec3 vectorEnemyToHero = enemies[i]->_position - _plane->_planeLocation;
+            glm::vec3 origin = glm::vec3(1,0,0);
+            enemies[i]->_angle = atan2(vectorEnemyToHero.z,vectorEnemyToHero.x) - atan2(origin.z,origin.x) + M_PI;
+
             //update direction to face hero
             enemies[i]->_direction = enemies[i]->_position - _plane->_planeLocation;
 
@@ -790,10 +811,7 @@ void A3Engine::_updateScene() {
 
             enemies[i]->_position.y = height;
 
-            //calcute the angle they must rotate in order to face the hero
-            glm::vec3 vectorEnemyToHero = enemies[i]->_position - _plane->_planeLocation;
-            glm::vec3 origin = glm::vec3(1,0,0);
-            enemies[i]->_angle = atan2(vectorEnemyToHero.z,vectorEnemyToHero.x) - atan2(origin.z,origin.x) + M_PI;
+
         }
         //update particles if they are dead
         enemies[i]->checkDead();
@@ -801,6 +819,9 @@ void A3Engine::_updateScene() {
         //do enemy collision detection within eachother
         for(int j = 0; j < numEnemies; j++){
             if(j == i){
+                continue;
+            }
+            if(enemies[j]->dead){
                 continue;
             }
 
@@ -816,6 +837,14 @@ void A3Engine::_updateScene() {
             if(distance2 <= distance){
                 //make larger enemy grow larger and faster
                 enemies[i]->consumedCount += enemies[j]->consumedCount;
+
+                /*
+                if(enemies[i]->consumedCount > 25 && enemies[i]->consumedCount < 50){
+                    cout << "EASTER EGG: MEGA MODE" << endl;
+                    enemies[i]->consumedCount *= 2;
+                    _plane->size *= 1.5;
+                }
+                 */
                 enemies[i]->size = sqrt(enemies[i]->consumedCount / 2.0f);
                 enemies[i]->speed += 0.005;
 
@@ -958,6 +987,10 @@ void A3Engine::_updateScene() {
         }
 
     } else {
+        if ((float)timer / 100 > 3){
+            timer = 1;
+        }
+        timer++;
         //if plane is dead update particles and then reset the enemy locations
         _plane->checkDead();
         if(_plane->dead == false){

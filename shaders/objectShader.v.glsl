@@ -7,6 +7,8 @@ uniform vec3 lightDir;
 uniform vec3 lightColor;
 uniform vec3 spotLightPosition;
 uniform mat4 modelMatrix;
+uniform float time;
+
 
 uniform vec3 materialColor;             // the material color for our vertex (& whole object)
 
@@ -27,13 +29,18 @@ void main() {
     vec3 trueVecNormal = normMatrix * vecNormal;
     vec3 diffuseComponent = lightColor * max(dot(reverseLightVector, trueVecNormal), 0);
 
-    color += diffuseComponent;
+    float timeComponent = sin(time) + 0.8;
+    if(timeComponent > 1){
+        timeComponent = 1;
+    }
+
+    color += diffuseComponent * timeComponent;
 
 //spot light
     vec3 worldCords = vec3(modelMatrix * vec4(vPos,1.0));
 
     vec3 spotLightDirection = vec3(0,-1,0);
-    float cutoffAngle = 0.99;
+    float cutoffAngle = 0.8;
 
     vec3 lightDir3 = normalize(spotLightPosition - worldCords);
 

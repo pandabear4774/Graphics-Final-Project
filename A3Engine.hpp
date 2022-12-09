@@ -147,6 +147,8 @@ private:
         GLint projMatrix;
         /// \desc the texture to apply
         GLint image;
+        /// \desc time variable for animation
+        GLint time;
     } _billboardShaderProgramUniforms;
     /// \desc stores the locations of all of our shader attributes
     struct BillboardShaderProgramAttributes {
@@ -164,6 +166,8 @@ private:
         GLint materialColor;
 
         GLuint normMtx;
+
+        GLuint time;
 
         GLuint spotlightPosition;
 
@@ -189,6 +193,8 @@ private:
         /// \desc precomputed MVP matrix location
         GLint mvpMatrix;
 
+        GLuint time;
+
         GLuint textMap;
 
     } _textureShaderUniformLocations;
@@ -210,6 +216,8 @@ private:
         GLint view;
         /// \desc the color to apply location
         GLint proj;
+
+        GLuint time;
 
         GLint skybox;
     } _skyboxShaderProgramUniformLocations;
